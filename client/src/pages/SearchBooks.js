@@ -8,6 +8,7 @@ import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
 const SearchBooks = () => {
   // create state for holding returned google api data
   const [searchedBooks, setSearchedBooks] = useState([]);
+
   // create state for holding our search field data
   const [searchInput, setSearchInput] = useState('');
 
@@ -65,6 +66,9 @@ const SearchBooks = () => {
     }
 
     try {
+
+      console.log(bookToSave);
+
       const response = await saveBook(bookToSave, token);
 
       if (!response.ok) {
