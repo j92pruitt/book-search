@@ -6,6 +6,16 @@ const resolvers = {
 
         users: async () => {
             return User.find({})
+        },
+
+        singleUser: async (parent, args) => {
+            return User.findById(args.userId)
+        },
+
+        me: async (parent, args, context) => {
+            if(context.user) {
+                return User.findById(context.user._id)
+            }
         }
     },
 

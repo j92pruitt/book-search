@@ -1,16 +1,38 @@
+const jwt = require('jsonwebtoken');
 const express = require('express');
 const path = require('path');
 const db = require('./config/connection');
 const routes = require('./routes');
 const { ApolloServer } = require('apollo-server-express');
 const { typeDefs, resolvers } = require('./schemas');
+const { gqlAuthMiddleware } = require('./utils/auth')
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+const secret = 'mysecretsshhhhh';
+const expiration = '2h';
+
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  // Add context to our server so data from the `authMiddleware()` function can pass data to our resolver functions
+  context: ( {req} ) => {
+    let token = req.headers.authorization || '';
+
+    if (req.headers.authorization) {
+      token = token.split(' ').pop().trim();
+    }
+
+    try {
+      const { data } = jwt.verify(token, secret, { maxAge: expiration});
+      req.user = data;
+    } catch(err) {
+      console.error(err)
+    }
+
+    return req
+  },
 });
 
 server.applyMiddleware({ app });
