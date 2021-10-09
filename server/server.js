@@ -22,13 +22,14 @@ const server = new ApolloServer({
 
     if (req.headers.authorization) {
       token = token.split(' ').pop().trim();
-    }
 
-    try {
-      const { data } = jwt.verify(token, secret, { maxAge: expiration});
-      req.user = data;
-    } catch(err) {
-      console.error(err)
+      try {
+        const { data } = jwt.verify(token, secret, { maxAge: expiration});
+        req.user = data;
+      } catch(err) {
+        console.error(err)
+      }
+
     }
 
     return req

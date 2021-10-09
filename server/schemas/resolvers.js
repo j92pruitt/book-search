@@ -24,6 +24,16 @@ const resolvers = {
         createUser: async (parent, args) => {
             const newUser = await User.create(args);
             return newUser
+        },
+
+        deleteBook: async (parent, args, context) => {
+            if(context.user) {
+                return User.findByIdAndUpdate(
+                    context.user._id,
+                    { $pull: { savedBooks: { bookId: args.bookId } } },
+                    { new: true }
+                )
+            }
         }
     }
 }
