@@ -13,9 +13,13 @@ const resolvers = {
         },
 
         me: async (parent, args, context) => {
-            if(context.user) {
-                return User.findById(context.user._id)
+
+            const id = context.user ? context.user._id : args.userId
+
+            if(id) {
+                return User.findById(id)
             }
+
         }
     },
 
@@ -27,12 +31,31 @@ const resolvers = {
         },
 
         deleteBook: async (parent, args, context) => {
-            if(context.user) {
+
+            const id = context.user ? context.user._id : args.userId
+
+            if(id) {
                 return User.findByIdAndUpdate(
-                    context.user._id,
+                    id,
                     { $pull: { savedBooks: { bookId: args.bookId } } },
                     { new: true }
                 )
+            }
+        },
+
+        addBook: async (parent, args, context) => {
+
+            const id = context.user ? context.user._id : args.userId
+
+            const {prunedUserId, ...newBook} = args
+            
+            if(id) {
+                
+                return User.findOneAndUpdate(
+                    id,
+                    { $addToSet: { savedBooks: newBook } },
+                    { new: true, runValidators: true }
+                );
             }
         }
     }
