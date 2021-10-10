@@ -1,5 +1,6 @@
-const { User } = require("../models")
-const { signToken } = require("../utils/auth")
+const { User } = require("../models");
+const { signToken } = require("../utils/auth");
+const { AuthenticationError } = require('apollo-server-express');
 
 const resolvers = {
 
@@ -32,6 +33,23 @@ const resolvers = {
             const token = signToken(newUser);
 
             return {token, user: newUser}
+        },
+
+        login: async (parent, { email, password }) => {
+            const user = await User.findOne({ email });
+      
+            if (!user) {
+              throw new AuthenticationError('No user with this email found!');
+            }
+      
+            const correctPw = await user.isCorrectPassword(password);
+      
+            if (!correctPw) {
+              throw new AuthenticationError('Incorrect password!');
+            }
+      
+            const token = signToken(user);
+            return { token, user };
         },
 
         deleteBook: async (parent, args, context) => {
