@@ -1,4 +1,5 @@
 const { User } = require("../models")
+const { signToken } = require("../utils/auth")
 
 const resolvers = {
 
@@ -27,7 +28,10 @@ const resolvers = {
 
         createUser: async (parent, args) => {
             const newUser = await User.create(args);
-            return newUser
+
+            const token = signToken(newUser);
+
+            return {token, user: newUser}
         },
 
         deleteBook: async (parent, args, context) => {
